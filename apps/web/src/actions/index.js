@@ -21,7 +21,7 @@ export function fetchJobs() {
 export function createJob(values, callback) {
     const request = axios.post(`${API}/new`, values)
         .then(() => callback());
-    
+
     return {
         type: CREATE_JOB,
         payload: request

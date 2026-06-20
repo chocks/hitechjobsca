@@ -51,6 +51,14 @@ docker compose up --build      # Postgres + API + nginx-served frontend
 # frontend: http://localhost:3000   api: http://localhost:8080
 ```
 
+A `Makefile` wraps the common workflows. `make run` runs the full stack via
+docker compose; `make help` lists every target (dev servers, per-app tests,
+ingest, pre-commit, cleanup).
+
+CI runs on push/PR to `main` via `.github/workflows/ci.yml`: pre-commit
+(gitleaks + hadolint), `apps/sync` pytest, `apps/api` Maven build, `apps/web`
+Vite build, and a `docker compose build` of all three images.
+
 The API reads DB credentials from `SPRING_DATASOURCE_*` env vars (set by
 docker-compose). Never hardcode credentials in `application.properties`.
 

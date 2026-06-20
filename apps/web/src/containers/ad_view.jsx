@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
- 
+
 
 class AdView extends Component {
     render() {

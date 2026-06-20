@@ -28,7 +28,7 @@ class PostSingleJob extends Component {
             </div>
         );
     }
-      
+
     onSubmit(values) {
         this.props.createJob(values, () => {
             this.props.history.push('/');
@@ -43,10 +43,10 @@ class PostSingleJob extends Component {
                 <Header />
                 <NavBar />
                 <blockquote className="blockquote text-center">
-                    <p className="mb-0">Jobs run for 60 days since date of posting</p> 
+                    <p className="mb-0">Jobs run for 60 days since date of posting</p>
                 </blockquote>
                 <form onSubmit={handleSubmit(this.onSubmit.bind(this))}>
-                    <Field 
+                    <Field
                             label="Job Title"
                             name="title"
                             type="text"
@@ -54,7 +54,7 @@ class PostSingleJob extends Component {
                             maxlength="128"
                             component={this.renderField}
                     />
-                    <Field 
+                    <Field
                             label="Salary Range"
                             name="salaryRange"
                             type="text"
@@ -62,7 +62,7 @@ class PostSingleJob extends Component {
                             maxlength="64"
                             component={this.renderField}
                     />
-                    <Field 
+                    <Field
                             label="Job Location"
                             name="location"
                             type="text"
@@ -70,7 +70,7 @@ class PostSingleJob extends Component {
                             maxlength="64"
                             component={this.renderField}
                     />
-                    <Field 
+                    <Field
                             label="Company Name"
                             name="companyName"
                             type="text"
@@ -78,7 +78,7 @@ class PostSingleJob extends Component {
                             maxlength="128"
                             component={this.renderField}
                     />
-                    <Field 
+                    <Field
                             label="Apply Link"
                             name="applyUrl"
                             type="url"
@@ -86,14 +86,14 @@ class PostSingleJob extends Component {
                             maxlength="256"
                             component={this.renderField}
                     />
-                    <Field 
+                    <Field
                             label="Contact Email"
                             name="contact"
                             type="email"
                             placeholder="ex: reachoutto@postingCompany.com"
                             maxlength="256"
                             component={this.renderField}
-                    /> 
+                    />
                     <button type="submit" className="btn btn-primary">Submit</button>
                     <Link to="/" className="btn btn-danger">Cancel</Link>
                 </form>
@@ -103,7 +103,7 @@ class PostSingleJob extends Component {
 }
 
 function validate(values) {
-    const errors = {}; 
+    const errors = {};
 
     //validate the input from the values object
     if(!values.title) {

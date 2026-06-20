@@ -81,7 +81,7 @@ class JobsList extends Component {
                 <div className="container">
                     {/* <ul className="list-group text-center"> */}
                     <iframe className="airtable-embed"
-                        src="https://airtable.com/embed/shr7jmzI1tiKQICgZ?backgroundColor=green&layout=card&viewControls=on" 
+                        src="https://airtable.com/embed/shr7jmzI1tiKQICgZ?backgroundColor=green&layout=card&viewControls=on"
                         frameBorder="0" onWheel = {this.wheel}  width="100%" height="533"
                         style={{background: 'transparent'}, {border: '1px'}, {solid: '#ccc'}}>
                     </iframe>
