@@ -1,0 +1,4 @@
+xmltodict
+psycopg2
+requests
+python-dateutil

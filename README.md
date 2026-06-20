@@ -12,9 +12,10 @@ so the code stays together and runnable.
 ```
 hitechjobsca/
 ├── apps/
-│   ├── web/   # React + Redux frontend (job listings, search, post-a-job)
-│   └── api/   # Spring Boot REST API backed by PostgreSQL full-text search
-├── db/init/   # Postgres schema + seed data
+│   ├── web/    # React + Redux frontend (job listings, search, post-a-job)
+│   ├── api/    # Spring Boot REST API backed by PostgreSQL full-text search
+│   └── sync/   # Python ingest: Stack Overflow RSS + GitHub issues → Postgres
+├── db/init/    # Postgres schema + seed data
 └── docker-compose.yml
 ```
 
@@ -28,6 +29,20 @@ React 16 + Redux + React Router, built with **Vite**. Talks to the API for
 Spring Boot 1.5 (Java 8), Spring Data JPA over PostgreSQL. Search is powered by
 a Postgres `tsvector` column with a `gin` index and an insert trigger, so
 listings are full-text searchable by title, company, and location.
+
+### apps/sync — jobs ingest (as-is, not yet wired to the current schema)
+The original 2020 Python script that pulls Canadian tech listings from Stack
+Overflow RSS feeds and a GitHub issues feed and loads them into Postgres. Added
+as-is; it is containerized and runnable, but its `INSERT INTO jobs (...)`
+statements target the old column set and do not yet match `jobs.all_jobs`
+(`db/init/01_schema.sql`). Schema alignment is on the roadmap. Run it once:
+
+```bash
+docker compose up -d db
+docker compose --profile sync run --rm sync
+```
+
+See [apps/sync/README.md](apps/sync/README.md) for details.
 
 ## Run it locally
 
@@ -74,6 +89,10 @@ This repo is being brought back to life incrementally:
 - [ ] Modernize the frontend framework — upgrade React 16 → React 19 (or
       rewrite in Vue 3). Bigger lift; a later improvement.
 - [ ] Modernize the API (Spring Boot 1.5 → current, Java 8 → current LTS)
+- [ ] Wire `apps/sync` into `jobs.all_jobs` — adapt the `INSERT INTO jobs (...)`
+      column set to the current schema (`apply_url`, `salary_range`, `ext_id`,
+      …) so ingest actually populates the board, then schedule it (cron/sidecar)
+- [ ] Modernize `apps/sync` — async/HTTP client, parameterized queries, tests
 - [ ] Add authentication + real payment verification to `POST /new`
 
 ## Development
