@@ -1,6 +1,6 @@
 package com.ck.so.data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -10,17 +10,16 @@ import java.util.UUID;
 public class AllJobs {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @SequenceGenerator(name="all_jobs_id_seq_gen", sequenceName = "all_jobs_id_seq")
     private Long id;
     private String title;
     private String companyName;
     private String applyUrl;
     private String salaryRange;
-    @Column(columnDefinition = "varchar[12] default 'Canada'")
+    @Column(columnDefinition = "varchar(64)")
     private String location = "Canada";
-    @Column(columnDefinition = "date default now()")
+    @Column(columnDefinition = "date")
     private Date fromDate = Date.valueOf(LocalDate.now());
-    @Column(columnDefinition="date default now() + interval '60 days'")
+    @Column(columnDefinition = "date")
     private Date endDate = Date.valueOf(LocalDate.now().plusDays(60));
     @Transient
     private String searchVectors;

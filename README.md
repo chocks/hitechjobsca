@@ -26,7 +26,7 @@ React 16 + Redux + React Router, built with **Vite**. Talks to the API for
 `npm run build` for a production bundle (`dist/`).
 
 ### apps/api — REST API
-Spring Boot 1.5 (Java 8), Spring Data JPA over PostgreSQL. Search is powered by
+Spring Boot 3.3 (Java 21 LTS), Spring Data JPA over PostgreSQL. Search is powered by
 a Postgres `tsvector` column with a `gin` index and an insert trigger, so
 listings are full-text searchable by title, company, and location.
 
@@ -58,7 +58,7 @@ docker compose up --build
 
 `docker compose up` starts three services: **Postgres** (seeded with sample
 Canadian tech listings + the full-text search trigger), the **Spring Boot API**
-(built in-container with Maven/JDK 8), and **nginx** serving the frontend and
+(built in-container with Maven/JDK 21), and **nginx** serving the frontend and
 reverse-proxying the API paths so the browser talks to it same-origin.
 
 ## Press & mentions
@@ -88,12 +88,15 @@ This repo is being brought back to life incrementally:
       `bundle.js`
 - [ ] Modernize the frontend framework — upgrade React 16 → React 19 (or
       rewrite in Vue 3). Bigger lift; a later improvement.
-- [ ] Modernize the API (Spring Boot 1.5 → current, Java 8 → current LTS)
+- [x] Modernize the API (Spring Boot 1.5 → 3.3, Java 8 → 21 LTS; javax →
+      jakarta persistence, Hibernate 6 dialect; drop dead `Config` + Gradle
+      build files)
 - [ ] Wire `apps/sync` into `jobs.all_jobs` — adapt the `INSERT INTO jobs (...)`
       column set to the current schema (`apply_url`, `salary_range`, `ext_id`,
       …) so ingest actually populates the board, then schedule it (cron/sidecar)
 - [ ] Modernize `apps/sync` — async/HTTP client, parameterized queries, tests
 - [ ] Add authentication + real payment verification to `POST /new`
+- [ ] Add CI (pre-commit hooks + Docker build, and run tests once they exist)
 
 ## Development
 
