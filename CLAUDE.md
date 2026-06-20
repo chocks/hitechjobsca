@@ -29,7 +29,7 @@ gh pr create --fill
   API base URL is set in `apps/web/src/actions/index.js` (empty string =
   same-origin via nginx). Dev: `npm run dev`; production build: `npm run build`
   → `dist/` (gitignored; built fresh in the Docker image).
-- `apps/api` — Spring Boot 1.5 (Java 8) REST API, Spring Data JPA over
+- `apps/api` — Spring Boot 3.3 (Java 21 LTS) REST API, Spring Data JPA over
   PostgreSQL. Full-text search uses a `tsvector` column + `gin` index + insert
   trigger (see `db/init/01_schema.sql`). Endpoints: `GET /ca_jobs`,
   `GET /search?searchString=`, `POST /new`.
@@ -58,7 +58,9 @@ docker-compose). Never hardcode credentials in `application.properties`.
 ## Known modernization debt (incremental)
 
 - ~~Frontend: Webpack 1 → a current bundler~~ — done (Vite; `bundle.js` removed).
-- API: Spring Boot 1.5 → current; Java 8 → current LTS.
+- ~~API: Spring Boot 1.5 → current; Java 8 → current LTS~~ — done (Spring Boot
+  3.3, Java 21, Jakarta persistence).
+- Frontend: React 16 → React 19 (or rewrite in Vue 3). Bigger lift; later.
 - The original app has **no auth on `POST /new`** and a stubbed payment flow
   (`Orders(contact, description)` fabricates a paid order). This is legacy
   behavior preserved as-is, not safe for a public deployment — see the
