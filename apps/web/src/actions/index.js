@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-const API = 'https://api.hitechjobs.ca';
-//const API = 'http://localhost:8080';
+// Same-origin: nginx (apps/web/nginx.conf) reverse-proxies the API paths to
+// the `api` service, so requests resolve to `/ca_jobs`, `/new`, `/search`.
+const API = '';
 
 export const FETCH_JOBS = 'fetch_jobs';
 export const CREATE_JOB = "create_job";

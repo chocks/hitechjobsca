@@ -49944,7 +49944,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var API = 'https://api.hitechjobs.ca';
+	var API = '';
 	//const API = 'http://localhost:8080';
 
 	var FETCH_JOBS = exports.FETCH_JOBS = 'fetch_jobs';

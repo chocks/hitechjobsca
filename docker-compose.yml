@@ -1,0 +1,46 @@
+# Full local stack: Postgres + Spring Boot API + nginx-served frontend.
+#   docker compose up --build
+# Then open http://localhost:3000
+#
+# Credentials come from .env (copy .env.example -> .env). The defaults below
+# are dev-only.
+
+services:
+  db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-jodb}
+      POSTGRES_USER: ${POSTGRES_USER:-developer}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-developer}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-developer} -d ${POSTGRES_DB:-jodb}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  api:
+    build: ./apps/api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-jodb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-developer}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-developer}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+
+  web:
+    build: ./apps/web
+    depends_on:
+      - api
+    ports:
+      - "3000:80"
+
+volumes:
+  pgdata:
