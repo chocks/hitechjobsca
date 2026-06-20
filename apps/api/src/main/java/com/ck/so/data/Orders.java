@@ -1,6 +1,6 @@
 package com.ck.so.data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Date;
 import java.time.LocalDate;
 
@@ -15,7 +15,7 @@ public class Orders {
     private String contact;
     private Integer amount;
     private String currency;
-    @Column(columnDefinition = "date default now()")
+    @Column(columnDefinition = "date")
     private Date date = Date.valueOf(LocalDate.now());
     private String description;
 

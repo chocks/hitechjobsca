@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface AllJobsRepository extends CrudRepository<AllJobs, Long> {
-    @Query("select a from AllJobs a where a.endDate >= now() AND " +
+    @Query("select a from AllJobs a where a.endDate >= current_date AND " +
             "a.status is True ORDER BY a.rank ASC, a.fromDate DESC")
     List<AllJobs> findAllActiveJobs();
 
