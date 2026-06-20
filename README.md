@@ -123,7 +123,11 @@ This repo is being brought back to life incrementally:
       `jobs.all_jobs` like the other sources.
 - [ ] Schedule `apps/sync` (cron/sidecar) now that it is schema-aligned
 - [ ] Add authentication + real payment verification to `POST /new`
-- [ ] Add CI (pre-commit hooks + Docker build, and run tests once they exist)
+- [x] Add CI (pre-commit hooks + Docker build, and run tests once they exist) —
+      GitHub Actions: pre-commit/gitleaks/hadolint, `apps/sync` pytest,
+      `apps/api` Maven build, `apps/web` Vite build, and a `docker compose
+      build` of all three images. A `Makefile` wraps local dev
+      (`make run` → `docker compose up --build`) and per-app tests.
 
 ## Development
 
@@ -135,6 +139,22 @@ pushes). Optional git hygiene + secret scanning via
 pre-commit install
 pre-commit run --all-files
 ```
+
+A `Makefile` wraps the common workflows (Docker stack, per-app dev/tests,
+pre-commit). `make help` lists every target:
+
+```bash
+make run          # db + api + web via docker compose (foreground, builds first)
+make up           # same, detached
+make down         # stop and remove containers
+make test         # apps/sync pytest + apps/api mvn test + apps/web vite build
+make sync         # run the jobs ingest once (needs the db service up)
+make precommit    # run pre-commit across all files
+```
+
+CI runs on every push/PR to `main` via `.github/workflows/ci.yml`: pre-commit
+(gitleaks + hadolint), `apps/sync` pytest, `apps/api` Maven build, `apps/web`
+Vite build, and a `docker compose build` of all three images.
 
 ## License
 

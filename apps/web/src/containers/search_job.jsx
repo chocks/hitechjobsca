@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { fetchJobs, searchJobs } from '../actions';
 import moment from 'moment';
 
- 
+
 class JobSearch extends Component {
     constructor(props) {
         super(props);
@@ -17,7 +17,7 @@ class JobSearch extends Component {
         this.textInput.current.focus();
         if (event.key === 'Enter') {
             this.props.searchJobs(event.target.value);
-        } 
+        }
     }
 
     showLog(event) {
@@ -37,10 +37,10 @@ class JobSearch extends Component {
         };
         return (
             <div className="input-group mb-2">
-                <input type="text" className="form-control" 
-                        placeholder="Search.. ex: Java developer in Toronto" 
+                <input type="text" className="form-control"
+                        placeholder="Search.. ex: Java developer in Toronto"
                         aria-label="Search.."
-                        aria-describedby="basic-addon2" 
+                        aria-describedby="basic-addon2"
                         onKeyPress={this.onChange.bind(this)}
                         ref={this.textInput}
                 />
