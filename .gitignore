@@ -16,6 +16,12 @@ out/
 *.class
 .gradle/
 
+# --- Python (apps/sync) ---
+__pycache__/
+*.py[cod]
+.venv/
+apps/sync/data/
+
 # --- IDE ---
 .idea/
 .vscode/

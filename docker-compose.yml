@@ -42,5 +42,25 @@ services:
     ports:
       - "3000:80"
 
+  # Jobs ingest script. Runs once and exits. Behind a profile so it does not
+  # start with the main stack. Run it with:
+  #   docker compose --profile sync run --rm sync
+  # NOTE: as-is; inserts do not yet match jobs.all_jobs (see apps/sync/README.md).
+  sync:
+    profiles: ["sync"]
+    build: ./apps/sync
+    environment:
+      DB_HOST: db
+      DB_NAME: ${POSTGRES_DB:-jodb}
+      DB_USER: ${POSTGRES_USER:-developer}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-developer}
+      DATA_FOLDER: /data
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - syncdata:/data
+
 volumes:
   pgdata:
+  syncdata:
