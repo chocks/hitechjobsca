@@ -42,19 +42,24 @@ services:
     ports:
       - "3000:80"
 
-  # Jobs ingest script. Runs once and exits. Behind a profile so it does not
-  # start with the main stack. Run it with:
+  # Jobs ingest. Upserts into jobs.all_jobs (idempotent on ext_id). Runs once
+  # and exits by default; set SYNC_INTERVAL_SECONDS to run it as a loop/sidecar.
   #   docker compose --profile sync run --rm sync
-  # NOTE: as-is; inserts do not yet match jobs.all_jobs (see apps/sync/README.md).
+  #   # dry-run (fetch + parse, no DB write):
+  #   docker compose --profile sync run --rm -e SYNC_DRY_RUN=1 sync
   sync:
     profiles: ["sync"]
     build: ./apps/sync
     environment:
       DB_HOST: db
+      DB_PORT: "5432"
       DB_NAME: ${POSTGRES_DB:-jodb}
       DB_USER: ${POSTGRES_USER:-developer}
       DB_PASSWORD: ${POSTGRES_PASSWORD:-developer}
       DATA_FOLDER: /data
+      SYNC_INTERVAL_SECONDS: ${SYNC_INTERVAL_SECONDS:-}
+      SYNC_DRY_RUN: ${SYNC_DRY_RUN:-}
+      SYNC_GITHUB_TOKEN: ${SYNC_GITHUB_TOKEN:-}
     depends_on:
       db:
         condition: service_healthy

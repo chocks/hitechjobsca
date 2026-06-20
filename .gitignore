@@ -21,6 +21,8 @@ __pycache__/
 *.py[cod]
 .venv/
 apps/sync/data/
+apps/sync/.config
+*.python-version.local
 
 # --- IDE ---
 .idea/

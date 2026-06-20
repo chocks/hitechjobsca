@@ -33,13 +33,15 @@ gh pr create --fill
   PostgreSQL. Full-text search uses a `tsvector` column + `gin` index + insert
   trigger (see `db/init/01_schema.sql`). Endpoints: `GET /ca_jobs`,
   `GET /search?searchString=`, `POST /new`.
-- `apps/sync` — Python ingest script (original 2020 `myrepo/main.py`, added
-  **as-is**). Pulls Stack Overflow RSS + GitHub issues into Postgres.
-  `config.py` reads `DB_HOST`/`DB_NAME`/`DB_USER`/`DB_PASSWORD`/`DATA_FOLDER`
-  from the env (config-file fallback). Behind the `sync` Compose profile:
-  `docker compose --profile sync run --rm sync`. The `INSERT INTO jobs (...)`
-  statements do **not** yet match `jobs.all_jobs` — schema alignment is on the
-  roadmap; running it downloads feeds but fails on insert until that lands.
+- `apps/sync` — Python ingest script. Pulls Stack Overflow RSS + GitHub issues
+  into Postgres. `config.py` reads `DB_HOST`/`DB_NAME`/`DB_USER`/`DB_PASSWORD`/
+  `DATA_FOLDER` from the env (config-file fallback). Behind the `sync` Compose
+  profile: `docker compose --profile sync run --rm sync`. Modernized to write
+  to `jobs.all_jobs` via a parameterized batch upsert keyed on `ext_id`
+  (idempotent); async httpx fetch; dead SO RSS (404) is skipped gracefully and
+  the live GitHub `TechnologyMasters/jobs` issues feed is the working source.
+  uv-managed (`apps/sync/pyproject.toml`, `uv.lock`). Tests under
+  `apps/sync/tests/` (`uv run pytest`).
 - `db/init` — Postgres schema + seed data, run once on first container init.
 
 ## Running
@@ -68,10 +70,16 @@ docker-compose). Never hardcode credentials in `application.properties`.
 - ~~API: Spring Boot 1.5 → current; Java 8 → current LTS~~ — done (Spring Boot
   3.3, Java 21, Jakarta persistence).
 - Frontend: React 16 → React 19 (or rewrite in Vue 3). Bigger lift; later.
-- `apps/sync`: wire the `INSERT INTO jobs (...)` column set into `jobs.all_jobs`
-  (`apply_url`, `salary_range`, `ext_id`, …) so ingest populates the board;
-  then modernize (async/HTTP client, parameterized queries, tests) and schedule
-  it (cron/sidecar). Currently as-is and containerized but not schema-aligned.
+- `apps/sync`: ~~wire the `INSERT INTO jobs (...)` column set into
+  `jobs.all_jobs`~~ done; ~~modernize (async/HTTP client, parameterized
+  queries, tests)~~ done (async httpx, parameterized batch upsert, pytest,
+  uv-managed). Runnable once or on a loop (`SYNC_INTERVAL_SECONDS`). The dead
+  Stack Overflow RSS feed is handled gracefully (404 → skip); the live GitHub
+  `TechnologyMasters/jobs` issues feed is wired to `jobs.all_jobs`.
+- `apps/sync`: add a Hacker News "Who is hiring?" source (monthly
+  [Ask HN](https://news.ycombinator.com/item?id=48357725) thread → comments via
+  the HN/Algolia API → filter by the Canadian-city allowlist →
+  `jobs.all_jobs`). Scheduling the ingest (cron/sidecar) is also still open.
 - The original app has **no auth on `POST /new`** and a stubbed payment flow
   (`Orders(contact, description)` fabricates a paid order). This is legacy
   behavior preserved as-is, not safe for a public deployment — see the

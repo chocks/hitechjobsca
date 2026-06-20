@@ -1,0 +1,38 @@
+[project]
+name = "hitechjobsca-sync"
+version = "2.0.0"
+description = "HiTechJobs.CA jobs ingest: GitHub issues (and legacy SO RSS) -> Postgres"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Chocks Eswaramurthy" }]
+dependencies = [
+    "httpx>=0.27",
+    "psycopg2-binary>=2.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "respx>=0.21",
+]
+
+# Run as a module from the apps/sync dir:  uv run python -m sync
+[project.scripts]
+sync-ingest = "main:main"
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+filterwarnings = [
+    "error",
+    "ignore::pytest.PytestUnraisableExceptionWarning",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
