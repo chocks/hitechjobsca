@@ -1,12 +1,10 @@
 # Lightweight, language-agnostic hygiene + secret scanning. Heavy per-language
-# linters are intentionally omitted while the 2020 toolchains are still in use;
-# they can be added per app as each is modernized.
+# linters are intentionally omitted while the 2020 API toolchain is still in
+# use; they can be added per app as each is modernized.
 #
 #   pipx install pre-commit   (or: brew install pre-commit)
 #   pre-commit install
 #   pre-commit run --all-files
-
-exclude: '^apps/web/bundle\.js$'   # prebuilt 2020 artifact; not hand-edited
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks

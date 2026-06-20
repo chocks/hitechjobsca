@@ -19,10 +19,10 @@ hitechjobsca/
 ```
 
 ### apps/web — frontend
-React 16 + Redux + React Router, bundled with Webpack. Talks to the API for
+React 16 + Redux + React Router, built with **Vite**. Talks to the API for
 `/ca_jobs` (listings), `/search` (Postgres full-text search), and `/new`
-(post a job, with Stripe checkout). The 2020 Webpack 1 toolchain can't build on
-modern Node, so the prebuilt `bundle.js` is committed and served as-is for now.
+(post a job, with Stripe checkout). Run `npm run dev` for the dev server or
+`npm run build` for a production bundle (`dist/`).
 
 ### apps/api — REST API
 Spring Boot 1.5 (Java 8), Spring Data JPA over PostgreSQL. Search is powered by
@@ -69,14 +69,18 @@ This repo is being brought back to life incrementally:
 - [x] Consolidate `jobs-frontend` + `jobs-rest-api` into one monorepo
 - [x] Scrub credentials; configure the API via environment variables
 - [x] Dockerize the full stack (`docker compose up`: Postgres + API + nginx)
-- [ ] Modernize the frontend toolchain (Webpack 1 → current) and drop the
-      committed `bundle.js`
+- [x] Modernize the frontend toolchain (Webpack 1 → Vite); drop the committed
+      `bundle.js`
+- [ ] Modernize the frontend framework — upgrade React 16 → React 19 (or
+      rewrite in Vue 3). Bigger lift; a later improvement.
 - [ ] Modernize the API (Spring Boot 1.5 → current, Java 8 → current LTS)
 - [ ] Add authentication + real payment verification to `POST /new`
 
 ## Development
 
-Optional git hygiene + secret scanning via [pre-commit](https://pre-commit.com):
+`main` is protected — contribute via a branch and a pull request (no direct
+pushes). Optional git hygiene + secret scanning via
+[pre-commit](https://pre-commit.com):
 
 ```bash
 pre-commit install

@@ -5,6 +5,7 @@
 
 # --- Node (apps/web) ---
 node_modules/
+dist/
 npm-debug.log*
 yarn-error.log*
 
@@ -24,7 +25,3 @@ out/
 # --- OS ---
 .DS_Store
 Thumbs.db
-
-# NOTE: apps/web/bundle.js is intentionally tracked -- it is the prebuilt
-# frontend artifact (the 2020 Webpack 1 toolchain can't be rebuilt on modern
-# Node). It will be removed from version control once the build is modernized.

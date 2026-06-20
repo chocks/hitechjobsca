@@ -1,12 +1,6 @@
 node_modules/
-src/
-test/
-.babelrc
-.npmrc
-package.json
-package-lock.json
-webpack.config.js
-*.code-workspace
+dist/
 .idea/
+*.code-workspace
 .DS_Store
 README.md
