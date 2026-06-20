@@ -1,54 +1,79 @@
+"""Configuration for the jobs ingest (apps/sync).
+
+All settings come from environment variables (with sensible dev defaults) so
+the same image runs in Docker, cron, or a sidecar. The DB credential env var
+names (``DB_HOST``, ``DB_NAME``, ``DB_USER``, ``DB_PASSWORD``, ``DATA_FOLDER``)
+are unchanged from the original 2020 script for docker-compose compatibility.
+"""
+
+from __future__ import annotations
 
 import os
-import traceback
+from dataclasses import dataclass
 
-CONFIG_FILE_PATH = '/etc/opt/jobs-download/'
+DEFAULT_DB_HOST = "localhost"
+DEFAULT_DB_PORT = 5432
+DEFAULT_DB_NAME = "jodb"
+DEFAULT_DB_USER = "developer"
+DEFAULT_DB_PASSWORD = "developer"
+DEFAULT_DATA_FOLDER = "./data/"
+DEFAULT_REQUEST_TIMEOUT = 30.0
+
+_TRUE = {"1", "true", "yes", "y", "on"}
 
 
+def _env_bool(value: str | None, default: bool) -> bool:
+    if value is None:
+        return default
+    return value.strip().lower() in _TRUE
+
+
+def _env_int(value: str | None, default: int) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _env_float(value: str | None, default: float) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+@dataclass
 class Config:
-    def __init__(self, file_path=None):
-        self.config_file = file_path + '.config' if file_path else CONFIG_FILE_PATH + '.config'
-        self.db_host = os.environ.get('DB_HOST')
-        self.db_user = os.environ.get('DB_USER')
-        self.db_password = os.environ.get('DB_PASSWORD')
-        self.db_name = os.environ.get('DB_NAME')
-        self.data_folder = os.environ.get('DATA_FOLDER')
+    db_host: str
+    db_port: int
+    db_name: str
+    db_user: str
+    db_password: str
+    data_folder: str
+    github_token: str | None
+    dry_run: bool
+    interval_seconds: int | None
+    request_timeout: float
 
-        if not all([self.db_host, self.db_user, self.db_password, self.db_name, self.data_folder]):
-            try:
-                with open(self.config_file) as config_file_handle:
-                    for config_property in config_file_handle:
-                        configs = config_property.split('=')
+    @classmethod
+    def from_env(cls, env: dict[str, str] | None = None) -> "Config":
+        e = os.environ if env is None else env
+        interval = (e.get("SYNC_INTERVAL_SECONDS") or "").strip()
+        return cls(
+            db_host=e.get("DB_HOST", DEFAULT_DB_HOST),
+            db_port=_env_int(e.get("DB_PORT"), DEFAULT_DB_PORT),
+            db_name=e.get("DB_NAME", DEFAULT_DB_NAME),
+            db_user=e.get("DB_USER", DEFAULT_DB_USER),
+            db_password=e.get("DB_PASSWORD", DEFAULT_DB_PASSWORD),
+            data_folder=e.get("DATA_FOLDER", DEFAULT_DATA_FOLDER),
+            github_token=e.get("SYNC_GITHUB_TOKEN") or None,
+            dry_run=_env_bool(e.get("SYNC_DRY_RUN"), False),
+            interval_seconds=int(interval) if interval else None,
+            request_timeout=_env_float(e.get("SYNC_REQUEST_TIMEOUT"), DEFAULT_REQUEST_TIMEOUT),
+        )
 
-                        if configs[0] == 'DB_HOST':
-                            self.db_host = self.db_host or configs[1].rstrip('\n')
-                        elif configs[0] == 'DB_NAME':
-                            self.db_name = self.db_name or configs[1].rstrip('\n')
-                        elif configs[0] == 'DB_USER':
-                            self.db_user = self.db_user or configs[1].rstrip('\n')
-                        elif configs[0] == 'DB_PASSWORD':
-                            self.db_password = self.db_password or configs[1].rstrip('\n')
-                        elif configs[0] == 'DATA_FOLDER':
-                            self.data_folder = self.data_folder or configs[1].rstrip('\n')
-
-            except:
-                print('Cannot load config file')
-                traceback.print_exc()
-
-        if not self.data_folder:
-            self.data_folder = './'
-
-    def get_db_host(self):
-        return self.db_host
-
-    def get_db_name(self):
-        return self.db_name
-
-    def get_db_user(self):
-        return self.db_user
-
-    def get_db_password(self):
-        return self.db_password
-
-    def get_data_folder(self):
-        return self.data_folder
+    def dsn(self) -> str:
+        return (
+            f"postgresql://{self.db_user}:{self.db_password}"
+            f"@{self.db_host}:{self.db_port}/{self.db_name}"
+        )

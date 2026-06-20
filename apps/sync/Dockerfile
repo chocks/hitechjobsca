@@ -1,16 +1,24 @@
-# sync app: fetches Canadian tech jobs from Stack Overflow RSS + a GitHub
-# issues feed and loads them into Postgres. Runs once and exits; see
-# scripts/cronjob.sh for the original cron wrapper.
-FROM python:3.12-slim
+# sync app: fetches Canadian tech jobs (GitHub issues + legacy SO RSS) and
+# upserts them into Postgres jobs.all_jobs. Runs once by default; set
+# SYNC_INTERVAL_SECONDS to run on a loop as a sidecar. uv-managed deps.
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
-# hadolint ignore=DL3008
-RUN apt-get update && apt-get install -y --no-install-recommends gcc libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+ENV UV_LINK_MODE=copy \
+    UV_COMPILE_BYTECODE=1 \
+    UV_PROJECT_ENVIRONMENT=/app/.venv \
+    PATH=/app/.venv/bin:$PATH
 
 WORKDIR /app
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
-RUN mkdir -p /data
+
+# Install deps first for better layer caching. --frozen uses the committed
+# uv.lock; --no-dev skips the test toolchain from the production image.
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev
+
+# App source (tests/ and *.sql are dockerignored).
+COPY config.py main.py db.py ./
+COPY sources ./sources
+
 ENV DATA_FOLDER=/data/
+RUN mkdir -p /data
 CMD ["python", "main.py"]

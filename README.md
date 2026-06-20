@@ -30,19 +30,36 @@ Spring Boot 3.3 (Java 21 LTS), Spring Data JPA over PostgreSQL. Search is powere
 a Postgres `tsvector` column with a `gin` index and an insert trigger, so
 listings are full-text searchable by title, company, and location.
 
-### apps/sync — jobs ingest (as-is, not yet wired to the current schema)
-The original 2020 Python script that pulls Canadian tech listings from Stack
-Overflow RSS feeds and a GitHub issues feed and loads them into Postgres. Added
-as-is; it is containerized and runnable, but its `INSERT INTO jobs (...)`
-statements target the old column set and do not yet match `jobs.all_jobs`
-(`db/init/01_schema.sql`). Schema alignment is on the roadmap. Run it once:
+### apps/sync — jobs ingest
+Python ingest that pulls Canadian tech listings from a GitHub issues feed
+(`TechnologyMasters/jobs`) into Postgres, upserting into `jobs.all_jobs` keyed
+on `ext_id` (idempotent). The original Stack Overflow jobs RSS source is
+preserved but its feed was discontinued in 2023 (404/403 → skipped gracefully).
+Async httpx fetch, parameterized batch upsert, uv-managed deps, and a pytest
+suite. Run it once, or on a loop (`SYNC_INTERVAL_SECONDS`) as a sidecar:
 
 ```bash
 docker compose up -d db
 docker compose --profile sync run --rm sync
+# dry-run (fetch + parse, no DB write):
+docker compose --profile sync run --rm -e SYNC_DRY_RUN=1 sync
+# loop as a sidecar (every hour):
+docker compose --profile sync run --rm -e SYNC_INTERVAL_SECONDS=3600 sync
 ```
 
-See [apps/sync/README.md](apps/sync/README.md) for details.
+Locally with uv (tests included):
+
+```bash
+cd apps/sync
+uv sync --extra dev && uv run pytest      # test suite (no DB needed)
+DB_HOST=localhost DB_NAME=jodb DB_USER=developer \
+    DB_PASSWORD=developer uv run python main.py
+```
+
+Config comes from env vars (`DB_HOST`/`DB_PORT`/`DB_NAME`/`DB_USER`/
+`DB_PASSWORD`/`DATA_FOLDER`, plus `SYNC_INTERVAL_SECONDS`, `SYNC_DRY_RUN`,
+`SYNC_GITHUB_TOKEN`, `SYNC_REQUEST_TIMEOUT`); see `.env.example`. A Hacker
+News "Who is hiring?" source is on the roadmap.
 
 ## Run it locally
 
@@ -91,10 +108,20 @@ This repo is being brought back to life incrementally:
 - [x] Modernize the API (Spring Boot 1.5 → 3.3, Java 8 → 21 LTS; javax →
       jakarta persistence, Hibernate 6 dialect; drop dead `Config` + Gradle
       build files)
-- [ ] Wire `apps/sync` into `jobs.all_jobs` — adapt the `INSERT INTO jobs (...)`
+- [x] Wire `apps/sync` into `jobs.all_jobs` — adapt the `INSERT INTO jobs (...)`
       column set to the current schema (`apply_url`, `salary_range`, `ext_id`,
-      …) so ingest actually populates the board, then schedule it (cron/sidecar)
-- [ ] Modernize `apps/sync` — async/HTTP client, parameterized queries, tests
+      …) so ingest actually populates the board
+- [x] Modernize `apps/sync` — async/httpx client, parameterized batch upsert,
+      tests, uv-managed deps; dead SO RSS handled gracefully; GitHub issues
+      feed wired to `jobs.all_jobs`. Runnable once or on a loop
+      (`SYNC_INTERVAL_SECONDS`) as a sidecar.
+- [ ] Add a Hacker News "Who is hiring?" source to `apps/sync` — the monthly
+      [Ask HN: Who is hiring?](https://news.ycombinator.com/item?id=48357725)
+      thread is a rich, remote-friendly feed with Canadian postings (e.g.
+      "REMOTE (MUST LIVE IN CANADA)"). Pull comments via the HN/Algolia API,
+      filter by the existing Canadian-city allowlist, and normalize into
+      `jobs.all_jobs` like the other sources.
+- [ ] Schedule `apps/sync` (cron/sidecar) now that it is schema-aligned
 - [ ] Add authentication + real payment verification to `POST /new`
 - [ ] Add CI (pre-commit hooks + Docker build, and run tests once they exist)
 

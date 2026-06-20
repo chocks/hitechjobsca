@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"
+     xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/"
+     xmlns:atom="http://www.w3.org/2005/Atom"
+     xmlns:so="http://stackoverflow.com/jobs/">
+  <channel>
+    <title>Stack Overflow Jobs - Canada</title>
+    <opensearch:totalResults>2</opensearch:totalResults>
+    <item>
+      <title>Senior Backend Engineer (Java)</title>
+      <link>https://stackoverflow.com/jobs/12345/senior-backend-engineer</link>
+      <atom:author>
+        <atom:name>RBC</atom:name>
+      </atom:author>
+      <atom:updated>2024-04-15T10:00:00Z</atom:updated>
+      <so:location>Toronto, ON, Canada</so:location>
+    </item>
+    <item>
+      <title>Frontend Developer</title>
+      <link>https://stackoverflow.com/jobs/12346/frontend-developer</link>
+      <atom:author>
+        <atom:name>Wealthsimple</atom:name>
+      </atom:author>
+      <atom:updated>2024-04-16T10:00:00Z</atom:updated>
+      <so:location>Remote, Canada</so:location>
+    </item>
+  </channel>
+</rss>
