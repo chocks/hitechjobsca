@@ -9,13 +9,26 @@ originally two separate projects (`jobs-frontend`, `jobs-rest-api`) now
 consolidated into one monorepo. The live site is no longer running; the goal
 is to keep the code together, runnable, and modernized incrementally.
 
+## Contributing (branch protection)
+
+`main` is protected — **no direct pushes**. All changes go through a branch and
+a pull request:
+
+```bash
+git checkout -b feat/my-change
+# ...work, commit...
+git push -u origin feat/my-change
+gh pr create --fill
+```
+
 ## Layout
 
-- `apps/web` — React 16 + Redux frontend. Built in 2020 with **Webpack 1**,
-  which cannot build on modern Node. The committed `apps/web/bundle.js` is the
-  prebuilt artifact and is intentionally tracked until the build is modernized.
-  Source lives in `apps/web/src`; the API base URL is set in
-  `apps/web/src/actions/index.js` (empty string = same-origin via nginx).
+- `apps/web` — React 16 + Redux frontend, built with **Vite**. Source lives in
+  `apps/web/src` (`.jsx` for components, `.js` for actions/reducers); static
+  assets are in `apps/web/public` (served at `/static`, `/style`, `/seo`). The
+  API base URL is set in `apps/web/src/actions/index.js` (empty string =
+  same-origin via nginx). Dev: `npm run dev`; production build: `npm run build`
+  → `dist/` (gitignored; built fresh in the Docker image).
 - `apps/api` — Spring Boot 1.5 (Java 8) REST API, Spring Data JPA over
   PostgreSQL. Full-text search uses a `tsvector` column + `gin` index + insert
   trigger (see `db/init/01_schema.sql`). Endpoints: `GET /ca_jobs`,
@@ -44,7 +57,7 @@ docker-compose). Never hardcode credentials in `application.properties`.
 
 ## Known modernization debt (incremental)
 
-- Frontend: Webpack 1 → a current bundler; then stop committing `bundle.js`.
+- ~~Frontend: Webpack 1 → a current bundler~~ — done (Vite; `bundle.js` removed).
 - API: Spring Boot 1.5 → current; Java 8 → current LTS.
 - The original app has **no auth on `POST /new`** and a stubbed payment flow
   (`Orders(contact, description)` fabricates a paid order). This is legacy

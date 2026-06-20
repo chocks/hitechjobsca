@@ -1,38 +1,30 @@
 {
   "name": "tech-jobs",
-  "version": "2.0.0",
-  "description": "Latest tech jobs listings",
-  "main": "index.js",
-  "repository": "",
+  "version": "3.0.0",
+  "description": "Latest tech jobs listings — HiTechJobs.CA frontend",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "start": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
-    "test": "mocha --compilers js:babel-core/register --require ./test/test_helper.js --recursive ./test",
-    "test:watch": "npm run test -- --watch",
-    "build": "webpack"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "babel-core": "^6.2.1",
-    "babel-loader": "^6.2.0",
-    "babel-preset-es2015": "^6.1.18",
-    "babel-preset-react": "^6.1.18",
-    "webpack": "^1.12.9",
-    "webpack-dev-server": "^1.14.0"
-  },
+  "license": "MIT",
   "dependencies": {
-    "axios": "^0.18.0",
-    "babel-preset-stage-1": "^6.1.18",
-    "lodash": "^3.10.1",
-    "moment": "^2.22.2",
-    "react": "16.3.2",
-    "react-dom": "16.3.2",
+    "axios": "^1.7.9",
+    "lodash": "^4.17.21",
+    "moment": "^2.30.1",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
     "react-redux": "^4.4.9",
-    "react-router-dom": "^4.2.2",
-    "react-spinners": "^0.4.7",
+    "react-router-dom": "^4.3.1",
     "react-stripe-elements": "^2.0.1",
-    "redux": "4.0.0",
-    "redux-form": "^6.6.3",
+    "redux": "^4.0.5",
+    "redux-form": "^6.8.0",
     "redux-promise": "^0.6.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
   }
 }
